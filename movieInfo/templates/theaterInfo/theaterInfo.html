@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}
+劇院資料
+{% endblock %}
+{% block style %}
+<style>
+    .left-section,
+    .right-section {
+        min-height: 800px;
+    }
+
+    .left-section {
+        background-color: #333;
+    }
+
+    .right-section {
+        background-color: #555;
+
+    }
+
+    .transport-section {
+        background-color: #333;
+        border-radius: 5px;
+        padding: 5px;
+    }
+
+
+    .map-section {
+        display: inline-block;
+        width: 100%;
+        height: 50%;
+    }
+
+    .scrollable-content {
+        height: 200px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="box">
+    <!-- 左右內容部分 -->
+    <div class="content columns">
+        <!-- 左半部分 -->
+        <div class="left-section column is-6">
+            <div class="title">{{theater_title}}</div>
+            <div class="cinema-photo">
+                <img src="{{url}}" alt="戲院照片">
+            </div>
+
+            <p class="scrollable-content">{{sj}}</p>
+
+        </div>
+
+        <!-- 右半部分 -->
+        <div class="right-section column is-6">
+            <div>
+                <form action="." method="POST">
+                    {% csrf_token %}
+                    <select class="select is-medium" name="cinema_select">
+                        {% for cinema_group in cinema_groups %}
+                        <optgroup label="{{ cinema_group.group_name }}">
+                            {% for cinema in cinema_group.cinemas %}
+                            <option value="{{ cinema }}">{{ cinema }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+                    <button class="button is-medium" type="submit">搜尋</button>
+                </form>
+            </div>
+            <div class="transport-section">
+                <div class="title is-3">交通方式</div>
+                <p class="scrollable-content">{{tra}}</p>
+            </div>
+            {% include 'map.html'%}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

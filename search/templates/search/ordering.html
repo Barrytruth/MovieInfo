@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}
+訂票資訊
+{% endblock %}
+{% block style %}
+<style>
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        background-color: #1A1A1A;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-section {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .date-box {
+        padding: 10px;
+        margin-right: 10px;
+        font-size: 1.2em;
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 200px;
+        text-align: center;
+    }
+
+    .form-section button {
+        padding: 10px 20px;
+        font-size: 1.2em;
+        background-color: #002D62;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .form-section button:hover {
+        background-color: #004085;
+    }
+
+    .content {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .left-section,
+    .right-section {
+        width: 48%;
+        background-color: #333333;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+    }
+
+    .poster img,
+    .seat-map img {
+        max-width: 100%;
+        /* 限制圖片大小 */
+        max-height: 300px;
+        /* 可根據需要調整高度 */
+        border-radius: 5px;
+    }
+
+    table {
+        width: 100%;
+        text-align: center;
+        border-collapse: collapse;
+    }
+
+    table th,
+    table td {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+        color: #ffffff;
+    }
+
+    table th {
+        background-color: #555555;
+    }
+
+    table tr:nth-child(even) {
+        background-color: #555555;
+    }
+
+    table tr:nth-child(odd) {
+        background-color: #666666;
+    }
+
+    .selected {
+        color: blue;
+        /* 被選擇的影廳和場次顯示為藍色 */
+    }
+
+    .map-section {
+        height: 500px;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .map {
+        width: 100%;
+        height: 400px;
+        /* 根據需要調整地圖的高度 */
+        border-radius: 5px;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <!-- 日期、戲院顯示、確認按鈕 -->
+    <form class="form-section" method="POST" action=".">
+        {% csrf_token %}
+        <select class="date-box" name="select_day" id="select-day" onchange="this.form.submit()">
+            {% for date in dates %}
+            {% if date == current_date %}
+            <option value="{{date}}" selected>{{date}}</option>
+            {% else %}
+            <option value="{{date}}">{{date}}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+        <a class="date-box" href="{% url 'theaterInfo' %}?theaterID={{ theater.id }}">{{ theater_title }}</a>
+    </form>
+
+
+    <div class="content">
+        <div class="left-section">
+            <p class="title is-medium">{{movie_title}}</p>
+            <div class="poster">
+                <img src="{{ movie_poster_url }}" alt="Movie Poster">
+            </div>
+            <!-- Google Map 區塊 -->
+            {% include "map.html" %}
+        </div>
+
+        <div class="right-section">
+            {% if session_data|length is not 0 %}
+            <div class="session-list">
+                <p class="title is-medium">場次列表</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>影廳</th>
+                            <th>場次</th>
+                            <th>座位表查看</th>
+                        </tr>
+                    </thead>
+                    <tbody id="session_data">
+
+                        {% for session in session_data %}
+                        <tr>
+                            <td
+                                class="{% if session.room == selected_room and session.session == selected_session %}selected{% endif %}">
+                                {{ session.room }}</td>
+                            <td
+                                class="{% if session.room == selected_room and session.session == selected_session %}selected{% endif %}">
+                                {{ session.session }}</td>
+                            <td>
+                                <form method="POST"
+                                    onsubmit="return selectSession('{{ session.room }}', '{{ session.session }}');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="room" value="{{ session.room }}">
+                                    <input type="hidden" name="session" value="{{ session.session }}">
+                                    <button class="button" type="submit">選擇</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="seat-map" id="seat-map">
+                <img src="{{ seat_map_url }}" alt="Seat Map">
+            </div>
+            {% else %}
+            <div class="title is-4">該日已無座位資料</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
