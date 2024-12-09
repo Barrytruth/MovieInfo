@@ -33,7 +33,7 @@ def setup_driver():
     driver=webdriver.Chrome(service=chrome_service,options=chrome_options)
     return driver
 
-def verify_CAPTCHA(driver): # 驗證我不是機器人，只要失敗就 refresh 網頁並重新驗證 
+def verify_CAPTCHA(driver): # 驗證我不是機器人，只要失敗就 refresh 網頁並重新驗證
     try:
         username = driver.find_element(By.NAME,"Account")
         username.send_keys("barrytruth@hotmail.com")
@@ -165,7 +165,6 @@ def miramarSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
         driver.quit()
 
 def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
-    driver=setup_driver()
     emptySeat = []
     bookedSeat = []
     # movie_date = movie_date.strftime('%m月%d日') ### 發現抓取日期時會因為月份或日期的前導0而出錯，網頁本身沒有0
@@ -173,7 +172,7 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
     print("電影日期：",movie_date)
 
     try:
-        # driver=setup_driver()
+        driver=setup_driver()
         print("已開啟 webdriver")
         for z,m_room,m_session in zip(range(len(movie_session)),movie_room,movie_session):    
 
