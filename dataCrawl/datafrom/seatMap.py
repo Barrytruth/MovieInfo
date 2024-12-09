@@ -169,11 +169,11 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
     bookedSeat = []
     # movie_date = movie_date.strftime('%m月%d日') ### 發現抓取日期時會因為月份或日期的前導0而出錯，網頁本身沒有0
     movie_date = f"{movie_date.month}月{movie_date.day}日"
-    # print(movie_date)
+    print("電影日期：",movie_date)
 
     try:
         driver=setup_driver()
-    
+        print("已開啟 webdriver")
         for z,m_room,m_session in zip(range(len(movie_session)),movie_room,movie_session):    
 
             m_room = m_room.lstrip(theater_name) # 專案中的電影爬蟲給的影廳是前面帶有戲院名稱的，所以這裡要刪除掉        
@@ -183,7 +183,7 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
                 bookedSeat = ""
                 seatImage = ""
                 continue
-
+            print("準備進入網頁")
             if z == 0:
                 main_page = "https://www.showtimes.com.tw/"
                 choose_addr = "programs/"                
@@ -200,7 +200,7 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
                 ########################################### 進入座位表 ###########################################
 
             driver.get(main_page+choose_addr)
-                
+            print("取得網頁內容")
 
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "sc-gFAWRd")))
             # 選電影
