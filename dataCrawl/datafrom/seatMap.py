@@ -23,15 +23,15 @@ from datetime import datetime
 
 def setup_driver():
     chrome_options = Options()
-    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN") # only for Heroku 不用 Heroku 時要註解掉
     chrome_options.add_argument("--headless") #無頭模式
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
-    chrome_service = Service(os.environ.get("CHROMEDRIVER_PATH"))
+    chrome_service = Service(os.environ.get("CHROMEDRIVER_PATH")) # only for Heroku 不用 Heroku 時要註解掉
     
-    driver=webdriver.Chrome(options=chrome_options)
-    driver=webdriver.Chrome(service=chrome_service,options=chrome_options)
+    # driver=webdriver.Chrome(options=chrome_options)
+    driver=webdriver.Chrome(service=chrome_service,options=chrome_options) # only for Heroku 不用 Heroku 時要註解掉
     return driver
 
 def verify_CAPTCHA(driver): # 驗證我不是機器人，只要失敗就 refresh 網頁並重新驗證
@@ -168,13 +168,13 @@ def miramarSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
 def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
     emptySeat = []
     bookedSeat = []
-    driver=setup_driver()
+    # driver=setup_driver()
     # movie_date = movie_date.strftime('%m月%d日') ### 發現抓取日期時會因為月份或日期的前導0而出錯，網頁本身沒有0
     movie_date = f"{movie_date.month}月{movie_date.day}日"
     print("電影日期：",movie_date)
 
     try:
-        # driver=setup_driver()
+        driver=setup_driver()
         print("已開啟 webdriver")
         for z,m_room,m_session in zip(range(len(movie_session)),movie_room,movie_session):    
 
@@ -210,26 +210,26 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             driver.execute_script("arguments[0].click();", sel_btn_m)
             print("選電影 OK")
             # 選戲院
-            sel_btn_th = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//button[contains(text(), '{theater_name}')]")))
+            sel_btn_th = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, f"//button[contains(text(), '{theater_name}')]")))
             driver.execute_script("arguments[0].click();", sel_btn_th)
             print("選戲院 OK")
             # 選日期
-            sel_btn_d = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//span[contains(text(), '{movie_date}')]")))
+            sel_btn_d = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, f"//span[contains(text(), '{movie_date}')]")))
             driver.execute_script("arguments[0].click();", sel_btn_d)
             print("選日期 OK")
             # 選場次
             
-            sel_btn_s = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//div[contains(normalize-space(), '{m_room}')]/following-sibling::div//button[contains(text(), '{m_session}')]")))
+            sel_btn_s = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, f"//div[contains(normalize-space(), '{m_room}')]/following-sibling::div//button[contains(text(), '{m_session}')]")))
             driver.execute_script("arguments[0].click();", sel_btn_s)
             print("選場次 OK")
             ########################################### 彈出視窗 ###########################################
-            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn-primary")))
+            WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn-primary")))
             cfm = driver.find_elements(By.CLASS_NAME,"btn-primary")
             driver.execute_script("arguments[0].click();", cfm[2])
             ###############################################################################################
             
             # 選訂票張數
-            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "form-control")))
+            WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CLASS_NAME, "form-control")))
             sel_btn_tk = Select(driver.find_elements(By.CLASS_NAME,"form-control")[0]) # 找出所有票種的選單，並選擇第1個票種的選單(有的電影只有一種票)
             sel_btn_tk.select_by_value("1")   # 選擇1張票
             print("選訂票張數 OK")
@@ -238,11 +238,11 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             seat_btn.click()
             print("選取座位按鈕-成功按下")
             ########################################### 彈出視窗 ###########################################
-            WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "site-modal")))
+            WebDriverWait(driver, 30).until(EC.visibility_of_element_located((By.ID, "site-modal")))
             cfm_f = driver.find_elements(By.CLASS_NAME,"btn-primary")
             driver.execute_script("arguments[0].click();", cfm_f[1])
             #################### 等網頁更新、有Class = sc-iHmpnF 後，再開始獲取網頁作解析 ####################
-            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "sc-iHmpnF")))
+            WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.CLASS_NAME, "sc-iHmpnF")))
             seatInfo = driver.page_source
             soop = BeautifulSoup(seatInfo,"html.parser")
             ########################################### 座位資料處理 ###########################################
