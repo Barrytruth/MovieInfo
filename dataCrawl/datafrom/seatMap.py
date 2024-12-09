@@ -33,7 +33,7 @@ def setup_driver():
     driver=webdriver.Chrome(service=chrome_service,options=chrome_options)
     return driver
 
-def verify_CAPTCHA(driver): # 驗證我不是機器人，只要失敗就 refresh 網頁並重新驗證
+def verify_CAPTCHA(driver): # 驗證我不是機器人，只要失敗就 refresh 網頁並重新驗證 
     try:
         username = driver.find_element(By.NAME,"Account")
         username.send_keys("barrytruth@hotmail.com")
