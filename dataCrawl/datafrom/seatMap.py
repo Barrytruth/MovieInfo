@@ -154,7 +154,8 @@ def miramarSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
                 seatImage = ""
         
         if movie_session != [""]:
-            driver.quit()        
+            driver.quit()
+            print("關閉 webdriver")
         return emptySeat, bookedSeat, seatImage
     except TimeoutException as e:
         print("於WebDriverWait的步驟中發生了TimeoutException")
@@ -205,17 +206,20 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             # 選電影
             sel_btn_m = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//div[contains(text(), '{movie_name}')]/ancestor::div[2]/following-sibling::div[contains(@class, 'sc-iHbSHJ')]")))
             driver.execute_script("arguments[0].click();", sel_btn_m)
+            print("選電影 OK")
             # 選戲院
             sel_btn_th = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//button[contains(text(), '{theater_name}')]")))
             driver.execute_script("arguments[0].click();", sel_btn_th)
+            print("選戲院 OK")
             # 選日期
             sel_btn_d = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//span[contains(text(), '{movie_date}')]")))
             driver.execute_script("arguments[0].click();", sel_btn_d)
+            print("選日期 OK")
             # 選場次
             
             sel_btn_s = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//div[contains(normalize-space(), '{m_room}')]/following-sibling::div//button[contains(text(), '{m_session}')]")))
             driver.execute_script("arguments[0].click();", sel_btn_s)
-            
+            print("選場次 OK")
             ########################################### 彈出視窗 ###########################################
             WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "btn-primary")))
             cfm = driver.find_elements(By.CLASS_NAME,"btn-primary")
@@ -226,11 +230,11 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "form-control")))
             sel_btn_tk = Select(driver.find_elements(By.CLASS_NAME,"form-control")[0]) # 找出所有票種的選單，並選擇第1個票種的選單(有的電影只有一種票)
             sel_btn_tk.select_by_value("1")   # 選擇1張票
-            
+            print("選訂票張數 OK")
             # 按下[開始選取座位]按鈕
             seat_btn = driver.find_element(By.CLASS_NAME,"sc-fBdRDi")
             seat_btn.click()
-            
+            print("選取座位按鈕-成功按下")
             ########################################### 彈出視窗 ###########################################
             WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "site-modal")))
             cfm_f = driver.find_elements(By.CLASS_NAME,"btn-primary")
@@ -243,7 +247,7 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             table = soop.select("div.sc-iHmpnF")
             eSeat = 0
             bSeat = 0
-            
+            print("開始處理資料")
             for j,i in zip(range(len(table)),table):
                 if len(i.text) == 0 or i.text.isdigit() == False or "hXhSKb" in str(i):
                     continue
@@ -255,7 +259,8 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             
             emptySeat.append(eSeat)
             bookedSeat.append(bSeat)
-            
+            print("資料處理完成")
+
             if len(movie_session) == 1:
                 ########################################### 座位表區截圖 ###########################################
                 seat_map = driver.find_element(By.CLASS_NAME, 'sc-ehixzo')
@@ -277,6 +282,7 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
 
         if movie_session != [""]:
             driver.quit()
+            print("關閉 webdriver 1")
         return emptySeat, bookedSeat, seatImage
     except TimeoutException as  e:
         print("於WebDriverWait的步驟中發生了TimeoutException")
@@ -284,6 +290,7 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
         return "暫無資料","暫無資料","暫無資料"
     finally:
         driver.quit()
+        print("關閉 webdriver 2")
 
 def ambassadorSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
     
@@ -308,7 +315,7 @@ def ambassadorSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             pwd = "a1s2d3987"
         
             driver = setup_driver()
-
+            
             ############################# 起始斷頭模式動態網頁方式，並取得網頁資料 #############################
             # options = webdriver.ChromeOptions()
             # options.add_argument("--headless")
@@ -329,7 +336,9 @@ def ambassadorSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             driver.execute_script("arguments[0].click();", agree_ckbox)
             login_btn = driver.find_element(By.ID,"butSignIn")
             login_btn.click()
-            
+
+            print("登入完成")
+
             ########################################### 進入訂票頁 ###########################################
             # close_btn = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.ID, "bot1-Msg1"))) # 關閉警告顯示範圍太小的彈出視窗
             # close_btn.click() ############################################################################ 關閉警告顯示範圍太小的彈出視窗
@@ -339,13 +348,16 @@ def ambassadorSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,"selTheatreName")))
             cinema = Select(driver.find_element(By.ID,"selTheatreName"))
             cinema.select_by_visible_text(theater_name)
+            print("選戲院 OK")
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,"selMovieName")))
             movie = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, f"//select[@id='selMovieName']/option[contains(text(), '{movie_name}')]")))
             movie.click()
+            print("選電影 OK")
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,"txtScreeningDate")))
             date = driver.find_element(By.ID,"txtScreeningDate")
             date.send_keys(movie_date)
             date.send_keys(Keys.ENTER)
+            print("選日期 OK")
             ##### 讓跳出的日期表消失 #####
             temp = driver.find_element(By.CLASS_NAME,"navbar-brand_2")
             actions = ActionChains(driver)
@@ -356,10 +368,10 @@ def ambassadorSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
                 if t.text == movie_session:
                     t.click()
                     break
-            
+            print("選場次 OK")
             slctck = driver.find_element(By.ID,"btnSelectTickets") # 按下 [選擇票種張數] 按鈕
             slctck.click()
-            
+            print("開始進入選票數頁面")
             close_btn = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.ID, "bot2-Msg1"))) # 在彈出視窗點擊 [OK] 進入選票種與張數畫面
             close_btn.click() ############################################################################ 在彈出視窗點擊 [OK] 進入選票種與張數畫面
             
@@ -375,11 +387,11 @@ def ambassadorSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             tckt_prt = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//select[contains(@onchange, 'bookingTicketQuantityChanged')]")))
             tckt = Select(tckt_prt)
             tckt.select_by_value("1")    
-            
+            print("選票數 OK")
             # 按下選位按鈕
             strt_seat = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.ID, "btnSelectSeats")))
             strt_seat.click()
-            
+            print("選取座位按鈕-成功按下")
             
             ########################################### 座位表區截圖 ###########################################
             time.sleep(3)
@@ -389,17 +401,19 @@ def ambassadorSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             # 使用 selenium 的 get_screenshot_as_png 獲取圖的二進位數據
             image_data = seat_map.screenshot_as_png  # 這將返回 PNG 格式的二進位數據
             # 使用 BytesIO 將截圖的二進位數據儲存至RAM
+            print("截圖完成")
             image_stream = BytesIO(image_data)
             image_stream.seek(0)
             # 使用 PIL 打開RAM中的圖
             image = Image.open(image_stream)
             # 將圖轉換為 base64 格式
             buffered = BytesIO()
+            print("轉圖完成")
             image.save(buffered, format="PNG")
             seatImage = "data:image/png;base64," + base64.b64encode(buffered.getvalue()).decode('utf-8')
-        
+            print("準備好圖檔資料")
             driver.quit()
-        
+            print("關閉 webdriver 1")
             emptySeat = [""]
             bookedSeat = [""]
             
@@ -421,6 +435,7 @@ def ambassadorSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
     
     finally:
         driver.quit()
+        print("關閉 webdriver 2")
 
 def vieshowSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
     emptySeat = []
