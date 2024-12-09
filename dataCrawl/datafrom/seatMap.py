@@ -167,12 +167,13 @@ def miramarSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
 def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
     emptySeat = []
     bookedSeat = []
+    driver=setup_driver()
     # movie_date = movie_date.strftime('%m月%d日') ### 發現抓取日期時會因為月份或日期的前導0而出錯，網頁本身沒有0
     movie_date = f"{movie_date.month}月{movie_date.day}日"
     print("電影日期：",movie_date)
 
     try:
-        driver=setup_driver()
+        # driver=setup_driver()
         print("已開啟 webdriver")
         for z,m_room,m_session in zip(range(len(movie_session)),movie_room,movie_session):    
 
