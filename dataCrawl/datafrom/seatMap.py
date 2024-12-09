@@ -184,7 +184,7 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
                 bookedSeat = ""
                 seatImage = ""
                 continue
-            print("準備進入網頁")
+            print("準備進入網頁-")
             if z == 0:
                 main_page = "https://www.showtimes.com.tw/"
                 choose_addr = "programs/"                
