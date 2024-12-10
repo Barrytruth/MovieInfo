@@ -209,9 +209,15 @@ def showtimeSeat(theater_name,movie_name,movie_date,movie_room,movie_session):
             sel_btn_m = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, f"//div[contains(text(), '{movie_name}')]/ancestor::div[2]/following-sibling::div[contains(@class, 'sc-iHbSHJ')]")))
             driver.execute_script("arguments[0].click();", sel_btn_m)
             print("選電影 OK")
-            print(driver)
-            print("--------------- print end ---------------")
-            # 選戲院
+            a = driver.page_source
+            print(a)
+            print("---------- Print End ----------")
+            time.sleep(20)
+            print("等了20秒")
+            time.sleep(20)
+            print("又等了20秒")
+            time.sleep(20)
+            print("等最後20秒")
             sel_btn_th = WebDriverWait(driver, 30).until(EC.element_to_be_clickable((By.XPATH, f"//button[contains(text(), '{theater_name}')]")))
             driver.execute_script("arguments[0].click();", sel_btn_th)
             print("選戲院 OK")
