@@ -17,22 +17,7 @@ def valid_data(your_objects,model):
         print(obj,"處理中...")
         try:
             obj.full_clean()  # 驗證模型的所有約束
-            # model.objects.get_or_create(obj) # 之前不知是誰改的，ChatGPT 說這是錯的用法
-            movie, created = model.objects.get_or_create(title=obj.title, defaults={ # ChatGPT 修正以後功能正常，結果正確了
-                "img_src": obj.img_src,
-                "trailer_link": obj.trailer_link,
-                "movie_type": obj.movie_type,
-                "main_actor": obj.main_actor,
-                "info": obj.info,
-                "release_date": obj.release_date,
-                "running_time": obj.running_time,
-                "screen_type": obj.screen_type
-            }) # ChatGPT 修正以後功能正常，結果正確了
-            if created: # ChatGPT 新增
-                print(f"✅ 新增電影: {obj.title}")
-            else:
-                print(f"⚠️ 電影已存在: {obj.title}") # ChatGPT 新增
-
+            model.objects.get_or_create(obj)
             print(obj,"完成")
         except ValidationError as e:
             invalid_objects.append(obj)

@@ -5,18 +5,15 @@ import pandas as pd
 
 data = pd.DataFrame()
 
-
 def get_soup(url):
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
     return soup
 
-
 total = []
 moviename, movieposterurl, movieupday, moviescreen = [], [], [], []
 urls1, urls2, Previewurl = [], [], []
 cast, movetype, times, movsj = [], [], [], []
-
 
 def get_movie():
     soup = get_soup("https://www.miramarcinemas.tw/Movie/Index?type=now")  # 上映
@@ -46,7 +43,7 @@ def get_movie():
     for urlz in urls1:
         r = requests.get(urlz)
         soup = BeautifulSoup(r.text, "html.parser")
-        cast_items = soup.find("ul", class_="movie_info_item")
+        cast_items = soup.select("ul.movie_info_item > li")
         for item in cast_items:
             text = item.get_text(strip=True)
             if "類型 GENRE" in text:
@@ -90,7 +87,7 @@ def get_movie():
 
     for urlz in urls2:
         soup = get_soup(urlz)
-        cast_items = soup.find("ul", class_="movie_info_item")
+        cast_items = soup.select("ul.movie_info_item")
         for item in cast_items:
             text = item.get_text(strip=True)
             if "類型 GENRE" in text:
@@ -202,6 +199,6 @@ def get_theater():
 
 
 if __name__ == "__main__":
-    # print(get_movie())
-    print(get_showTimeInfo())
+    print(get_movie())
+    # print(get_showTimeInfo())
     # print(get_theater())

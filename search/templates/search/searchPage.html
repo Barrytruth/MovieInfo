@@ -8,18 +8,33 @@
         text-decoration: none;
     }
 
+    #toggle-button {
+        background-color: rgb(45, 10, 5);
+        border-color: rgb(165, 115, 40);
+    }
+
     .poster {
         border-radius: 5px;
     }
 
     .movie-img {
         min-height: 500px;
-        height: 500px;
+        max-height: 500px;
         background-color: black;
     }
 
     .scrollable-content {
         height: 300px;
+        margin: 5px;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        background-color: rgb(0, 180, 255);
+        margin: 6px;
+    }
+
+    .checkbox {
+        font-size: large;
         margin: 5px;
     }
 </style>
@@ -28,24 +43,22 @@
 <script src="https://code.jquery.com/jquery-latest.min.js"></script>
 {% endblock %}
 {% block content %}
-<form action="" method="post">
+<form action="" method="post" id="search-form">
     {% csrf_token %}
-    <div class="columns" id="search-area">
+    <div class="columns is-vcentered" id="search-area">
 
         <div class="column is-3">
-            <div class="title is-5">選擇螢幕(Imax, 3D)</div>
-            <input type="checkbox" id="Imax" name="Imax">
-            <label for="Imax">Imax</label>
-            <input type="checkbox" id="3D" name="3D">
-            <label for="3D">3D</label>
+            <div class="title is-5" style="background-color: rgb(75, 80, 110);">選擇螢幕(Imax, 3D)</div>
+            <label class="checkbox" for="Imax"><input type="checkbox" id="Imax" name="screen" value="Imax">Imax</label>
+            <label class="checkbox" for="3D"><input type="checkbox" id="3D" name="screen" value="3D">3D</label>
         </div>
         <div class="column">
-            <input type="button" class="button" id="toggle-button" value="顯示即將上映">
+            <input type="button" class="button search-func has-text-warning" id="toggle-button" value="顯示即將上映">
         </div>
         <div class="column">
             <div class="control">
-                <div class="select">
-                    <select id="area" name="area">
+                <div class="select is-info">
+                    <select id="area" name="area" class="has-text-info">
                         <option value="">選擇地區</option>
                         <option value="north">北部</option>
                         <option value="central">中部</option>
@@ -56,8 +69,8 @@
         </div>
         <div class="column">
             <div class="control">
-                <div class="select">
-                    <select id="cinema" name="cinema">
+                <div class="select is-info">
+                    <select id="cinema" name="cinema" class="has-text-info">
                         <option value="">選擇戲院</option>
                         {% for cinema in cinemas %}
                         <option value="{{cinema}}">{{cinema}}</option>
@@ -68,13 +81,14 @@
         </div>
         <div class="column">
             <div class="control">
-                <input class="input" type="date" name="date" min="{{dayStart}}" max="{{dayEnd}}" value="{{select_day}}">
+                <input class="input is-info" style="color: aqua;" type="date" name="date" min="{{dayStart}}"
+                    max="{{dayEnd}}" value="{{select_day}}">
             </div>
         </div>
 
         <div class="column is-5 field has-addons">
             <div class="control">
-                <input class="input" type="text" placeholder="輸入電影關鍵字" name="movieTitle">
+                <input class="input is-info" type="text" placeholder="輸入電影關鍵字" name="movieTitle">
             </div>
             <div class="control">
                 <button class="button is-info">搜尋</button>
@@ -103,12 +117,14 @@
                     {% csrf_token %}
                     <input type="hidden" name="movie_title" value="{{movie.title}}">
                     <input type="hidden" name="select_day" value="{{select_day}}">
-                    <select class="select is-medium" id="theater" name="theater">
+
+                    <select class="select is-medium" style="width: 50%;" name="theater">
                         {% for theater in movie.theaters %}
                         <option value="{{ theater }}">{{ theater }}</option>
                         {% endfor %}
                     </select>
-                    <button class="button is-medium is-info" type="submit">搜尋</button>
+                    <button class="is-2 button is-medium is-info" type="submit">搜尋</button>
+
                 </form>
 
             </div>
@@ -169,16 +185,62 @@
 
     });
 
-    $(function () {
-        var len = 200; // 超過字數以"..."取代
-        $(".content").each(function (i) {
-            if ($(this).text().length > len) {
-                $(this).attr("title", $(this).text());
-                var text = $(this).text().substring(0, len - 1) + "...";
-                $(this).text(text);
+    // 保存查詢紀錄
+    // 當表單欄位變更時自動儲存資料
+    document.getElementById("search-form").addEventListener("input", function () {
+        const formData = new FormData(this);
+        const formObject = {};
+
+        formData.forEach((value, key) => {
+            if (key === 'screen') {
+                // 將選中的 checkbox 儲存為陣列
+                if (!formObject[key]) {
+                    formObject[key] = [];
+                }
+                formObject[key].push(value);
+            } else if (key === "csrfmiddlewaretoken") {
+                return;
+            } else {
+                formObject[key] = value;
             }
         });
+
+        // 儲存表單資料為 JSON 格式
+        sessionStorage.setItem('userFormData', JSON.stringify(formObject));
     });
+
+    // 預填表單資料
+    window.addEventListener("load", function () {
+        const savedData = JSON.parse(sessionStorage.getItem('userFormData'));
+
+        if (savedData) {
+            Object.keys(savedData).forEach((key) => {
+                const input = document.querySelector(`#search-form [name="${key}"]`);
+
+                if (input) {
+                    if (input.type === "checkbox") {
+                        // checkbox 類型
+                        if (Array.isArray(savedData[key])) {
+                            // 複數選項的 checkbox
+                            savedData[key].forEach(value => {
+                                const checkbox = document.querySelector(`#search-form [name="${key}"][value="${value}"]`);
+                                if (checkbox) {
+                                    checkbox.checked = true;
+                                }
+                            });
+                        } else {
+                            // 單一選項的 checkbox
+                            input.checked = savedData[key] === "on" || savedData[key] === true;
+                        }
+                    } else {
+                        // 其他類型的欄位直接回填
+                        input.value = savedData[key];
+                    }
+                }
+            });
+        }
+    });
+
 </script>
 
 {% endblock %}
