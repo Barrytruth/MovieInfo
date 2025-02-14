@@ -67,7 +67,10 @@ def copy_movies():
             running_time=movie[7],
             screen_type=movie[8],
         )
-        movie_datas.save(using="second_db")
+        try:
+            movie_datas.save(using="second_db")
+        except:
+            print(f"重複條目: {movie[0]}，已跳過")
 
 
 def extract_valid_times(input_string):
@@ -89,46 +92,27 @@ def movieUpdate(datas):
     # movie.objects.all().delete()
     moviesData = []
     movie_titles = [movie["title"] for movie in list(movie.objects.values("title"))]
-    file = open("z:\\log.txt","w",encoding="utf-8") # Barry debug
-    file.write("---------- datas 資料型別:"+str(type(datas))+" ----------\n")# Barry debug
-    for i in datas:
-        file.write(str(i)+"\n") # Barry debug
-    file.write("----------------------------------------------------------------------"+"\n"*3) # Barry debug
     for data in datas:
         print(data["電影名稱"], "篩選中...")
-        file.write("\n*****************************************************************************\n") # Barry debug
-        file.write(data["電影名稱"]+" 篩選中...\n") # Barry debug
         try:
         ### 剛好遇到神奇字元所以replace...
             title = data["電影名稱"].replace("／", "/")
-            file.write("title:"+str(title)+"\n") # Barry debug
             img_src = data["電影海報網址"][:100]
-            file.write("img_src:"+str(img_src)+"\n") # Barry debug
             trailer_link = data["電影預告網址"][:100]
-            file.write("trailer_link:"+str(trailer_link)+"\n") # Barry debug
             movie_type = data["影片類型"][:100]
-            file.write("movie_type:"+str(movie_type)+"\n") # Barry debug
             main_actor = data["主要演員"][:100]
-            file.write("main_actor:"+str(main_actor)+"\n") # Barry debug
             info = data["電影介紹"][:500]
-            file.write("info:"+str(info)+"\n") # Barry debug
             release_date = data["上或待上映"][:100] if data["上或待上映"]!='未知' else None
             if release_date and '/' in release_date:
                 release_date=release_date.replace('/','-')
-            file.write("release_date:"+str(release_date)+"\n") # Barry debug
             running_time = data["電影時長"][:100]
-            file.write("running_time:"+str(running_time)+"\n") # Barry debug
             screen_type = data["電影螢幕"]
-            file.write("screen_type:"+str(screen_type)+"\n") # Barry debug
 
         except Exception as e:
             print(title, "輸入格式出現錯誤: ", str(e))
-            file.write(str(title)+"輸入格式出現錯誤: \n") # Barry debug
-            file.write("錯誤訊息：\n"+str(e)+"\n") # Barry debug
             continue
         if title in movie_titles or title in [movie.title for movie in moviesData]:
             print(title, "已存在")
-            file.write(str(title)+"已存在") # Barry debug
             continue
         moviesData.append(
             movie(
@@ -143,27 +127,9 @@ def movieUpdate(datas):
                 screen_type=screen_type,
             )
         )
-    file1=open("z:\\moviesData.txt","w",encoding="utf-8") # Barry debug
-    for j in moviesData: # Barry debug
-        file1.write(f"Title: {j.title}\n") # Barry debug
-        file1.write(f"Image Source: {j.img_src}\n") # Barry debug
-        file1.write(f"Trailer Link: {j.trailer_link}\n") # Barry debug
-        file1.write(f"Movie Type: {j.movie_type}\n") # Barry debug
-        file1.write(f"Main Actor: {j.main_actor}\n") # Barry debug
-        file1.write(f"Info: {j.info}\n") # Barry debug
-        file1.write(f"Release Date: {j.release_date}\n") # Barry debug
-        file1.write(f"Running Time: {j.running_time}\n") # Barry debug
-        file1.write(f"Screen Type: {j.screen_type}\n") # Barry debug
-        file1.write("\n" + "*"*77 + "\n"*2) # Barry debug
-    file1.close() # Barry debug
-    print("=========================== valid_data =================================") # Barry debug
+
     invalid=valid_data(moviesData,movie)
-    print("========================================================================") # Barry debug
     print("無效資料: ",invalid)
-    file.write("============================================================\n") # Barry debug
-    file.write("無效資料: \n"+str(invalid)) # Barry debug
-    file.write("============================================================\n") # Barry debug
-    file.close() # Barry debug
     # movie.objects.bulk_create(valid)
 
 

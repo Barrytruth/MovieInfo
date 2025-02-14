@@ -80,67 +80,37 @@ WSGI_APPLICATION = "djangoDEMO.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        # "NAME": BASE_DIR / "db.sqlite3",
-        "NAME": os.environ.get("DATABASE_URL", BASE_DIR / "db.sqlite3"),
-    },
-    "second_db": dj_database_url.config(env='JAWSDB_URL', conn_max_age=600)
-}
-
-
-
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.sqlite3",
 #         # "NAME": BASE_DIR / "db.sqlite3",
 #         "NAME": os.environ.get("DATABASE_URL", BASE_DIR / "db.sqlite3"),
 #     },
-#     "second_db": { # 因為Heroku開始對 MariaDB 以及 Postgres 收費，因此原來帳號不能用，要改用 JawsDB，也因此這裡的設定需改寫，這裡的DB設定是原本的
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "tznqw1c01pl66tzg",
-#         "USER": "nb8d0e7fu2pces8t",
-#         "PASSWORD": "wi6f1jms4eaabcct",
-#         "HOST": "q57yawiwmnaw13d2.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
-#         "PORT": "3306",
-#         "OPTIONS": {
-#             "init_command": "SET sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'",
-#             'charset': 'utf8mb4',
-#         },
-#     }
+#     "second_db": dj_database_url.config(env='JAWSDB_URL', conn_max_age=600)
 # }
+
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        # "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.environ.get("DATABASE_URL", BASE_DIR / "db.sqlite3"),
+    },
+    "second_db": { # 因為Heroku開始對 MariaDB 以及 Postgres 收費，而 JawsDB 因不明原因一直無法登入，因此原來帳號不能用，要改用外部的SQL Server，也因此這裡的設定需改寫。
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "barrysql",
+        "USER": "barrytruth",
+        "PASSWORD": "0915562075",
+        "HOST": "db4free.net",
+        "PORT": "3306",
+        "OPTIONS": {
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'",
+            'charset': 'utf8mb4',
+        }
+    }
+}
 
 DATABASE_ROUTERS = ['djangoDEMO.db_router.MyRouter']
-
-# DATABASES = {
-#     "second_db": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "test",
-#         "USER": "root",
-#         "PASSWORD":"123456789",
-#         "HOST": "127.0.0.1",
-#         "PORT": "3306",
-#         'OPTIONS': {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'",
-#         },
-#     }
-# }
-
-# DATABASES = {
-#     "second_db": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "tznqw1c01pl66tzg",
-#         "USER": "nb8d0e7fu2pces8t",
-#         "PASSWORD": "wi6f1jms4eaabcct",
-#         "HOST": "q57yawiwmnaw13d2.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
-#         "PORT": "3306",
-#         "OPTIONS": {
-#             "init_command": "SET sql_mode='STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'",
-#         },
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
